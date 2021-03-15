@@ -46,7 +46,8 @@ class Roles(Base):
     def get_awards(self):
         response = {}
         try:
-            response = req.request('get', CONFIG.AWARD_URL, headers=self.get_header()).json()
+            response = req.to_python(req.request(
+                'get', CONFIG.AWARD_URL, headers=self.get_header()).text)
         except json.JSONDecodeError as e:
             raise Exception(e)
 
@@ -56,7 +57,8 @@ class Roles(Base):
         log.info('准备获取账号信息...')
         response = {}
         try:
-            response = req.request('get', CONFIG.ROLE_URL, headers=self.get_header()).json()
+            response = req.to_python(req.request(
+                'get', CONFIG.ROLE_URL, headers=self.get_header()).text)
             message = response['message']
         except Exception as e:
             raise Exception(e)
@@ -121,8 +123,9 @@ class Sign(Base):
             info_url = CONFIG.INFO_URL.format(
                 self._region_list[i], CONFIG.ACT_ID, self._uid_list[i])
             try:
-                content = req.request('get', info_url, headers=self.get_header()).json()
-                info_list.append(content)
+                content = req.request(
+                    'get', info_url, headers=self.get_header()).text
+                info_list.append(req.to_python(content))
             except Exception as e:
                 raise Exception(e)
 
@@ -171,8 +174,9 @@ class Sign(Base):
             }
 
             try:
-                response = req.request('post', CONFIG.SIGN_URL, headers=self.get_header(),
-                    data=json.dumps(data, ensure_ascii=False)).json()
+                response = req.to_python(req.request(
+                    'post', CONFIG.SIGN_URL, headers=self.get_header(),
+                    data=json.dumps(data, ensure_ascii=False)).text)
             except Exception as e:
                 raise Exception(e)
             code = response.get('retcode', 99999)
